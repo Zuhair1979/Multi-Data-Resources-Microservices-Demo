@@ -1,0 +1,10 @@
+pipeline{
+    stages{
+        stage("confirm docker inside jenkins"){
+            steps{
+                sh 'docker version'
+                sh 'docker ps'
+            }
+        }
+    }
+}
