@@ -31,4 +31,8 @@ public class Roles {
         this.role_id = role_id;
         this.role_desc = user_name;
     }
+
+    public Roles(String role_desc) {
+        this.role_desc = role_desc;
+    }
 }

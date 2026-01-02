@@ -18,9 +18,14 @@ public class User {
     @Column(name="user_id")
     private Integer userId;
 
+
+    @Column(name = "user_name", nullable = false, unique = true)
+    private String username;
+
     // link to login info
     @OneToOne
-    @JoinColumn(name="user_name")
+    @JoinColumn(name = "user_name", referencedColumnName = "user_name",
+            insertable = false, updatable = false)
     LoginInfo loginInfo;
 
 

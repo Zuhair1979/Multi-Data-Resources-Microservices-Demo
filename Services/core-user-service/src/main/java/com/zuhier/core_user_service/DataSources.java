@@ -8,11 +8,14 @@ import com.zuhier.core_user_service.domain.LoginInfo;
 import com.zuhier.core_user_service.domain.Permission;
 import com.zuhier.core_user_service.domain.Roles;
 import com.zuhier.core_user_service.domain.User;
+import com.zuhier.core_user_service.providers.impl.LdapServiceImplementation;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,15 +38,12 @@ public class DataSources implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
+/* user testing
         LoginInfo loginInfo=new LoginInfo("zuhier","123");
-       // this.loginRep.save(loginInfo);
+        this.loginRep.save(loginInfo);
+        //#User user=new User();
+        User user= this.userRep.findById(1).get();
 
-
-        //User user=new User();
-
-
-
-       User user= this.userRep.findById(1).get();
 
         user.setLoginInfo(loginInfo);
         //************* test many to many relation user -> roles
@@ -55,10 +55,13 @@ public class DataSources implements CommandLineRunner {
         // create permission
         Permission createPermission=new Permission();
         createPermission.setPermission("Create Folder");
-        permissionRep.save(createPermission);
+     //   permissionRep.save(createPermission);
 
         user.getPermissions().add(createPermission);
-        userRep.save(user);
+     //   userRep.save(user);
+*/
+
+
 
     }
 }

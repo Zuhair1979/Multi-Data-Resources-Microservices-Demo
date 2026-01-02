@@ -33,4 +33,7 @@ public class Permission {
         this.permission = permission;
     }
 
+    public Permission(String permission) {
+        this.permission = permission;
+    }
 }
