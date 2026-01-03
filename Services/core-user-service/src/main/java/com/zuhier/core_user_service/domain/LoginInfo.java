@@ -26,4 +26,9 @@ public class LoginInfo {
 
     public LoginInfo() {
     }
+
+    @Override
+    public String toString() {
+        return this.userName +"  "+this.passWord;
+    }
 }

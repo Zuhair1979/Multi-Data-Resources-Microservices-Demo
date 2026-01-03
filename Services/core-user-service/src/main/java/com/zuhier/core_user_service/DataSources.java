@@ -9,6 +9,7 @@ import com.zuhier.core_user_service.domain.Permission;
 import com.zuhier.core_user_service.domain.Roles;
 import com.zuhier.core_user_service.domain.User;
 import com.zuhier.core_user_service.providers.impl.LdapServiceImplementation;
+import com.zuhier.core_user_service.services.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -34,10 +35,29 @@ public class DataSources implements CommandLineRunner {
     // user name as key, list of permissions as values
     Map<String, List<String>> userPermission;
 
+
+    private final UserService userService;
+
+    public DataSources(UserService userService) {
+        this.userService = userService;
+    }
     // create userinfo
     @Override
     @Transactional
     public void run(String... args) throws Exception {
+
+
+        System.out.println("DB RolesProvider called for: " );
+        User user1 = userRep.findByUsername("Zuhier");
+        System.out.println("User from DB is null? " + (user1 == null));
+        if (user1 != null) System.out.println("DB roles size=" + user1.getRoles().size());
+
+        User user = userService.aggregateUserInfo("Zuhier");
+
+        System.out.println("===== AGGREGATED USER =====");
+        System.out.println("Login: " + user.getLoginInfo());
+        System.out.println("Roles: " + user.getRoles());
+        System.out.println("Permissions: " + user.getPermissions());
 /* user testing
         LoginInfo loginInfo=new LoginInfo("zuhier","123");
         this.loginRep.save(loginInfo);

@@ -1,6 +1,7 @@
 package com.zuhier.core_user_service.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ public class Permission {
 
     // link to user
     @ManyToMany(mappedBy = "permissions")
+    @JsonIgnore
     private Set<User> users=new HashSet<>();
 
     public Permission(int permissionId, String permission) {
@@ -35,5 +37,10 @@ public class Permission {
 
     public Permission(String permission) {
         this.permission = permission;
+    }
+
+    @Override
+    public String toString() {
+        return this.permission;
     }
 }

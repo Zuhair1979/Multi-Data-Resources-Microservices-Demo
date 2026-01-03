@@ -6,11 +6,12 @@ import com.zuhier.core_user_service.domain.Roles;
 import com.zuhier.core_user_service.domain.User;
 import com.zuhier.core_user_service.providers.RolesProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
-
+@Component
 public class DBServiceImplementation implements RolesProvider {
 
     @Autowired

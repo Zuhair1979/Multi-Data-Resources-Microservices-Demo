@@ -1,5 +1,6 @@
 package com.zuhier.core_user_service.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,7 @@ public class Roles {
 
     // link to user in many to many relation
     @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
     private Set<User> users=new HashSet<>();
 
        public Roles(Integer role_id, String user_name) {
@@ -34,5 +36,10 @@ public class Roles {
 
     public Roles(String role_desc) {
         this.role_desc = role_desc;
+    }
+
+    @Override
+    public String toString() {
+        return this.role_desc;
     }
 }
