@@ -1,83 +1,51 @@
 pipeline {
-    agent any // This allows the pipeline to use the 'docker' command from the host
+  agent {
+    docker {
+      image 'maven:3.9-eclipse-temurin-17'
+      args '-v /var/run/docker.sock:/var/run/docker.sock'
+    }
+  }
 
-    environment {
-        APP_IMAGE = "core-user-service:latest"
-        APP_DIR   = "Services/core-user-service"
+  environment {
+    APP_IMAGE = "core-user-service:latest"
+    APP_DIR   = "Services/core-user-service"
+  }
+
+  options { timestamps() }
+
+  stages {
+    stage('Show environment') {
+      steps {
+        sh '''
+          echo "Workspace: $WORKSPACE"
+          java -version || true
+          mvn -version || true
+          command -v docker && docker version || true
+        '''
+      }
     }
 
-    options {
-        timestamps()
+    stage('Build & Test (Maven)') {
+      steps {
+        dir("${APP_DIR}") {
+          sh 'mvn -B -U clean test'
+          sh 'mvn -B -DskipTests package'
+        }
+      }
     }
 
-    stages {
-        stage('Show environment') {
-            steps {
-                sh '''
-                    echo "Workspace: $WORKSPACE"
-                    docker version
-                '''
-            }
+    stage('Docker Build') {
+      steps {
+        dir("${APP_DIR}") {
+          sh 'docker build -t ${APP_IMAGE} .'
         }
-
-        stage('Build & Test (Maven)') {
-            // We only use the Maven container for this specific stage
-            agent {
-                docker {
-                    image 'maven:3.9-eclipse-temurin-17'
-                    // Caches your Maven dependencies on the host for faster builds
-                    args '-v $HOME/.m2:/root/.m2'
-                }
-            }
-            steps {
-                dir("${APP_DIR}") {
-                    sh 'mvn -B -U clean package'
-                }
-            }
-            post {
-                always {
-                    dir("${APP_DIR}") {
-                        junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
-                    }
-                }
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                dir("${APP_DIR}") {
-                    sh '''
-                        echo "Building Docker image: ${APP_IMAGE}"
-                        docker build -t ${APP_IMAGE} .
-                    '''
-                }
-            }
-        }
-
-        stage('Optional: Compose Up (DEV)') {
-            when {
-                expression { 
-                    return fileExists("${APP_DIR}/docker-compose.yml") || fileExists("${APP_DIR}/compose.yml") 
-                }
-            }
-            steps {
-                dir("${APP_DIR}") {
-                    echo "Compose file found. You can uncomment the docker-compose command here if needed."
-                    // sh 'docker compose up -d'
-                }
-            }
-        }
+      }
     }
+  }
 
-    post {
-        always {
-            sh '''
-                echo "Done. Current containers:"
-                docker ps | head -n 5
-            '''
-        }
-        failure {
-            echo "Pipeline failed. Please check the logs above."
-        }
+  post {
+    always {
+      sh 'command -v docker && docker ps || true'
     }
+  }
 }
