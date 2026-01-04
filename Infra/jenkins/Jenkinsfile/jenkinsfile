@@ -1,19 +1,17 @@
 pipeline {
-  agent {
-    docker {
-      image 'maven:3.9-eclipse-temurin-17'
-      args '-v /var/run/docker.sock:/var/run/docker.sock'
-    }
-  }
+  agent any
 
   environment {
     APP_IMAGE = "core-user-service:latest"
     APP_DIR   = "Services/core-user-service"
   }
 
-  options { timestamps() }
+  options {
+    timestamps()
+  }
 
   stages {
+
     stage('Show environment') {
       steps {
         sh '''
@@ -32,12 +30,38 @@ pipeline {
           sh 'mvn -B -DskipTests package'
         }
       }
+      post {
+        always {
+          dir("${APP_DIR}") {
+            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+          }
+        }
+      }
     }
 
     stage('Docker Build') {
       steps {
         dir("${APP_DIR}") {
-          sh 'docker build -t ${APP_IMAGE} .'
+          sh '''
+            echo "Building Docker image: ${APP_IMAGE}"
+            docker build -t ${APP_IMAGE} .
+            docker images | head -n 20
+          '''
+        }
+      }
+    }
+
+    stage('Optional: Compose Up (DEV)') {
+      when {
+        expression { return fileExists("${APP_DIR}/docker-compose.yml") || fileExists("${APP_DIR}/compose.yml") }
+      }
+      steps {
+        dir("${APP_DIR}") {
+          sh '''
+            echo "Starting docker compose (optional stage)"
+            echo "Compose stage is currently disabled (commented)."
+            # docker compose up -d --build
+          '''
         }
       }
     }
@@ -45,7 +69,13 @@ pipeline {
 
   post {
     always {
-      sh 'command -v docker && docker ps || true'
+      sh '''
+        echo "Done. Current containers:"
+        command -v docker && docker ps || true
+      '''
+    }
+    failure {
+      echo "Pipeline failed. Check Console Output for details."
     }
   }
 }
