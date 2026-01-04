@@ -1,11 +1,86 @@
-pipeline{
-    agent any
-    stages{
-        stage("confirm docker inside jenkins"){
-            steps{
-                sh 'docker version'
-                sh 'docker ps'
-            }
-        }
+pipeline {
+  agent any
+
+  environment {
+    // Change these values to match your project
+    APP_IMAGE = "core-user-service:latest"
+    // If your service is inside a subfolder, set it here, e.g. "core-user-service"
+    APP_DIR   = "."
+  }
+
+  options {
+    timestamps()
+  }
+
+  stages {
+
+    stage('Show environment') {
+      steps {
+        sh '''
+          echo "Workspace: $WORKSPACE"
+          java -version || true
+          mvn -version || true
+          docker version
+        '''
+      }
     }
+
+    stage('Build & Test (Maven)') {
+      steps {
+        dir("${APP_DIR}") {
+          sh 'mvn -B -U clean test'
+          sh 'mvn -B -DskipTests package'
+        }
+      }
+      post {
+        always {
+          // archives test reports if they exist
+          dir("${APP_DIR}") {
+            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+          }
+        }
+      }
+    }
+
+    stage('Docker Build') {
+      steps {
+        dir("${APP_DIR}") {
+          sh '''
+            echo "Building Docker image: ${APP_IMAGE}"
+            docker build -t ${APP_IMAGE} .
+            docker images | head -n 20
+          '''
+        }
+      }
+    }
+
+    stage('Optional: Compose Up (DEV)') {
+      when {
+        expression { return fileExists("${APP_DIR}/docker-compose.yml") || fileExists("${APP_DIR}/compose.yml") }
+      }
+      steps {
+        dir("${APP_DIR}") {
+          sh '''
+            echo "Starting docker compose (optional stage)"
+            # Uncomment ONE of the following if you want Jenkins to start the stack:
+            # docker compose up -d --build
+            # docker-compose up -d --build
+            echo "Compose stage is currently disabled (commented)."
+          '''
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      sh '''
+        echo "Done. Current containers:"
+        docker ps || true
+      '''
+    }
+    failure {
+      sh 'echo "Pipeline failed. Check Console Output for details."'
+    }
+  }
 }
