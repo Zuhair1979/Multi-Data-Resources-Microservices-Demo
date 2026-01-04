@@ -5,7 +5,7 @@ pipeline {
     // Change these values to match your project
     APP_IMAGE = "core-user-service:latest"
     // If your service is inside a subfolder, set it here, e.g. "core-user-service"
-    APP_DIR   = "."
+    APP_DIR   = "Services/core-user-service"
   }
 
   options {
