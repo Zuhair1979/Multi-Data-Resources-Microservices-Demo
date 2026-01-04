@@ -1,166 +1,83 @@
 pipeline {
-  agent any
+    agent any // This allows the pipeline to use the 'docker' command from the host
 
-  environment {
-    // Change these values to match your project
-    APP_IMAGE = "core-user-service:latest"
-    // If your service is inside a subfolder, set it here, e.g. "core-user-service"
-    APP_DIR   = "."
-  }
-
-  options {
-    timestamps()
-  }
-
-  stages {
-
-    stage('Show environment') {
-      steps {
-        sh '''
-          echo "Workspace: $WORKSPACE"
-          java -version || true
-          mvn -version || true
-          docker version
-        '''
-      }
+    environment {
+        APP_IMAGE = "core-user-service:latest"
+        APP_DIR   = "Services/core-user-service"
     }
 
-    stage('Build & Test (Maven)') {
-      steps {
-        dir("${APP_DIR}") {
-          sh 'mvn -B -U clean test'
-          sh 'mvn -B -DskipTests package'
+    options {
+        timestamps()
+    }
+
+    stages {
+        stage('Show environment') {
+            steps {
+                sh '''
+                    echo "Workspace: $WORKSPACE"
+                    docker version
+                '''
+            }
         }
-      }
-      post {
+
+        stage('Build & Test (Maven)') {
+            // We only use the Maven container for this specific stage
+            agent {
+                docker {
+                    image 'maven:3.9-eclipse-temurin-17'
+                    // Caches your Maven dependencies on the host for faster builds
+                    args '-v $HOME/.m2:/root/.m2'
+                }
+            }
+            steps {
+                dir("${APP_DIR}") {
+                    sh 'mvn -B -U clean package'
+                }
+            }
+            post {
+                always {
+                    dir("${APP_DIR}") {
+                        junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                dir("${APP_DIR}") {
+                    sh '''
+                        echo "Building Docker image: ${APP_IMAGE}"
+                        docker build -t ${APP_IMAGE} .
+                    '''
+                }
+            }
+        }
+
+        stage('Optional: Compose Up (DEV)') {
+            when {
+                expression { 
+                    return fileExists("${APP_DIR}/docker-compose.yml") || fileExists("${APP_DIR}/compose.yml") 
+                }
+            }
+            steps {
+                dir("${APP_DIR}") {
+                    echo "Compose file found. You can uncomment the docker-compose command here if needed."
+                    // sh 'docker compose up -d'
+                }
+            }
+        }
+    }
+
+    post {
         always {
-          // archives test reports if they exist
-          dir("${APP_DIR}") {
-            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
-          }
+            sh '''
+                echo "Done. Current containers:"
+                docker ps | head -n 5
+            '''
         }
-      }
-    }
-
-    stage('Docker Build') {
-      steps {
-        dir("${APP_DIR}") {
-          sh '''
-            echo "Building Docker image: ${APP_IMAGE}"
-            docker build -t ${APP_IMAGE} .
-            docker images | head -n 20
-          '''
+        failure {
+            echo "Pipeline failed. Please check the logs above."
         }
-      }
     }
-
-    stage('Optional: Compose Up (DEV)') {
-      when {
-        expression { return fileExists("${APP_DIR}/docker-compose.yml") || fileExists("${APP_DIR}/compose.yml") }
-      }
-      steps {
-        dir("${APP_DIR}") {
-          sh '''
-            echo "Starting docker compose (optional stage)"
-            # Uncomment ONE of the following if you want Jenkins to start the stack:
-            # docker compose up -d --build
-            # docker-compose up -d --build
-            echo "Compose stage is currently disabled (commented)."
-          '''
-        }
-      }
-    }
-  }
-
-  pipeline {
-agent {
-    docker {
-      image 'maven:3.9-eclipse-temurin-17'
-      args '-v /var/run/docker.sock:/var/run/docker.sock'
-    }
-  }
-
-  environment {
-    // Change these values to match your project
-    APP_IMAGE = "core-user-service:latest"
-    // If your service is inside a subfolder, set it here, e.g. "core-user-service"
-    APP_DIR   = "Services/core-user-service"
-  }
-
-  options {
-    timestamps()
-  }
-
-  stages {
-
-    stage('Show environment') {
-      steps {
-        sh '''
-          echo "Workspace: $WORKSPACE"
-          java -version || true
-          mvn -version || true
-          docker version
-        '''
-      }
-    }
-
-    stage('Build & Test (Maven)') {
-      steps {
-        dir("${APP_DIR}") {
-          sh 'mvn -B -U clean test'
-          sh 'mvn -B -DskipTests package'
-        }
-      }
-      post {
-        always {
-          // archives test reports if they exist
-          dir("${APP_DIR}") {
-            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
-          }
-        }
-      }
-    }
-
-    stage('Docker Build') {
-      steps {
-        dir("${APP_DIR}") {
-          sh '''
-            echo "Building Docker image: ${APP_IMAGE}"
-            docker build -t ${APP_IMAGE} .
-            docker images | head -n 20
-          '''
-        }
-      }
-    }
-
-    stage('Optional: Compose Up (DEV)') {
-      when {
-        expression { return fileExists("${APP_DIR}/docker-compose.yml") || fileExists("${APP_DIR}/compose.yml") }
-      }
-      steps {
-        dir("${APP_DIR}") {
-          sh '''
-            echo "Starting docker compose (optional stage)"
-            # Uncomment ONE of the following if you want Jenkins to start the stack:
-            # docker compose up -d --build
-            # docker-compose up -d --build
-            echo "Compose stage is currently disabled (commented)."
-          '''
-        }
-      }
-    }
-  }
-
- post {
-  always {
-    sh '''
-      echo "Done. Current containers:"
-      command -v docker && docker ps || true
-    '''
-  }
 }
-}}
-  
-
-
-
