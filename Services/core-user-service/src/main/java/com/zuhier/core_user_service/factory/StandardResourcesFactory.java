@@ -1,8 +1,8 @@
 package com.zuhier.core_user_service.factory;
 
-import com.zuhier.core_user_service.domain.LoginInfo;
-import com.zuhier.core_user_service.domain.Permission;
-import com.zuhier.core_user_service.domain.Roles;
+import com.zuhier.core_user_service.domain_simulation.LoginInfo;
+import com.zuhier.core_user_service.domain_simulation.Permission;
+import com.zuhier.core_user_service.domain_simulation.Roles;
 import com.zuhier.core_user_service.providers.LoginInfoProvider;
 import com.zuhier.core_user_service.providers.PermissionProvider;
 import com.zuhier.core_user_service.providers.RolesProvider;

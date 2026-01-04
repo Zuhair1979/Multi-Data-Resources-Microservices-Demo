@@ -1,8 +1,8 @@
 package com.zuhier.core_user_service.factory;
 
-import com.zuhier.core_user_service.domain.LoginInfo;
-import com.zuhier.core_user_service.domain.Permission;
-import com.zuhier.core_user_service.domain.Roles;
+import com.zuhier.core_user_service.domain_simulation.LoginInfo;
+import com.zuhier.core_user_service.domain_simulation.Permission;
+import com.zuhier.core_user_service.domain_simulation.Roles;
 import com.zuhier.core_user_service.providers.LoginInfoProvider;
 import com.zuhier.core_user_service.providers.PermissionProvider;
 import com.zuhier.core_user_service.providers.RolesProvider;
@@ -30,13 +30,14 @@ public class ResourcesFactory implements StandardResourcesFactory {
       Future execution: if the same data type is delivered by multiple sources,
       *  we add a strategy (merge/priority/fallback) in the factory without changing UserService.*/
 
-    private LoginInfoProvider loginInfoProvider;
-    private PermissionProvider permissionProvider;
-    private RolesProvider rolesProvider;
+    private List<LoginInfoProvider> loginInfoProvider;
+    private List<PermissionProvider> permissionProvider;
+    private List<RolesProvider> rolesProvider;
 
 
 
-    public ResourcesFactory(RolesProvider rolesProvider, PermissionProvider permissionProvider, LoginInfoProvider loginInfoProvider) {
+    public ResourcesFactory(List<RolesProvider> rolesProvider, List<PermissionProvider> permissionProvider,
+                            List<LoginInfoProvider> loginInfoProvider) {
         this.rolesProvider = rolesProvider;
         this.permissionProvider = permissionProvider;
         this.loginInfoProvider = loginInfoProvider;
@@ -45,17 +46,17 @@ public class ResourcesFactory implements StandardResourcesFactory {
 
     @Override
     public List<LoginInfoProvider> loginInfoFactory() {
-        return List.of(this.loginInfoProvider);
+        return this.loginInfoProvider;
     }
 
     @Override
     public List<PermissionProvider> permissionFactory() {
-        return List.of(this.permissionProvider);
+        return this.permissionProvider;
     }
 
     @Override
     public List<RolesProvider> rolesFactory() {
-        return List.of(this.rolesProvider);
+        return this.rolesProvider;
     }
 
     @Override

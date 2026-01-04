@@ -1,6 +1,6 @@
 package com.zuhier.core_user_service.services;
 
-import com.zuhier.core_user_service.domain.User;
+import com.zuhier.core_user_service.domain_simulation.User;
 import com.zuhier.core_user_service.factory.StandardResourcesFactory;
 import org.springframework.stereotype.Component;
 

@@ -1,12 +1,10 @@
 package com.zuhier.core_user_service.providers.impl;
 
-import com.zuhier.core_user_service.domain.LoginInfo;
+import com.zuhier.core_user_service.domain_simulation.LoginInfo;
 import com.zuhier.core_user_service.providers.LoginInfoProvider;
-import com.zuhier.core_user_service.simulation.LDAP;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.zuhier.core_user_service.simulation_data.LDAP;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Component

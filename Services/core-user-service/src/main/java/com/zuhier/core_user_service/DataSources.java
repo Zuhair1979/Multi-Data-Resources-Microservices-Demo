@@ -4,19 +4,13 @@ import com.zuhier.core_user_service.dao.ILoginInfo;
 import com.zuhier.core_user_service.dao.IPermission;
 import com.zuhier.core_user_service.dao.IRoles;
 import com.zuhier.core_user_service.dao.IUser;
-import com.zuhier.core_user_service.domain.LoginInfo;
-import com.zuhier.core_user_service.domain.Permission;
-import com.zuhier.core_user_service.domain.Roles;
-import com.zuhier.core_user_service.domain.User;
-import com.zuhier.core_user_service.providers.impl.LdapServiceImplementation;
+import com.zuhier.core_user_service.domain_simulation.User;
 import com.zuhier.core_user_service.services.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 

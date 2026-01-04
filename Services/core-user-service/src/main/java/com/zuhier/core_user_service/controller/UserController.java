@@ -1,6 +1,6 @@
 package com.zuhier.core_user_service.controller;
 
-import com.zuhier.core_user_service.domain.User;
+import com.zuhier.core_user_service.domain_simulation.User;
 import com.zuhier.core_user_service.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

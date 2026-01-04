@@ -2,8 +2,8 @@ package com.zuhier.core_user_service.providers.impl;
 
 import com.zuhier.core_user_service.dao.IRoles;
 import com.zuhier.core_user_service.dao.IUser;
-import com.zuhier.core_user_service.domain.Roles;
-import com.zuhier.core_user_service.domain.User;
+import com.zuhier.core_user_service.domain_simulation.Roles;
+import com.zuhier.core_user_service.domain_simulation.User;
 import com.zuhier.core_user_service.providers.RolesProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

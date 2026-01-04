@@ -1,4 +1,4 @@
-package com.zuhier.core_user_service.domain;
+package com.zuhier.core_user_service.domain_simulation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity

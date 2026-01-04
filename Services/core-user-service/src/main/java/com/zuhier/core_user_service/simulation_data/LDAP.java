@@ -1,4 +1,4 @@
-package com.zuhier.core_user_service.simulation;
+package com.zuhier.core_user_service.simulation_data;
 
 import lombok.Getter;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.zuhier.core_user_service.domain;
+package com.zuhier.core_user_service.domain_simulation;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
